@@ -22,10 +22,6 @@ int main() {
     std::cout << "Matrix a has " << a.getRows() << " rows and " 
               << a.getCols() << " columns" << std::endl << std::endl;
 
-
-    /* move this line down through main.cpp as you develop Matrix.hpp
-
-
     // create a 2 x 2 matrix of integers.
     Matrix<int> m(2, 2);
     m[0][0] = 1;
@@ -56,13 +52,13 @@ int main() {
     std::cout << "Matrix p:" << std::endl;
     std::cout << n << std::endl;
 
-
     // perform comparisons of matrices.
     Matrix<int> mCopy(2, 2);
     mCopy[0][0] = 1;
     mCopy[0][1] = 2;
     mCopy[1][0] = 3;
     mCopy[1][1] = 4;
+    
     if (m == mCopy) {
         std::cout << "m and mCopy are equal." << std::endl;
     } else {
@@ -75,6 +71,7 @@ int main() {
     }
     std::cout << std::endl;
 
+    /* move this line down through main.cpp as you develop Matrix.hpp
     // add 2 matrices of integers.
     Matrix<int> iAdd = m + n;
     std::cout << "iAdd = m + n" << std::endl;

@@ -50,8 +50,9 @@ private:
 
 public:
     Matrix();
-    Matrix(int r, int c);
-    void print() const;
+    Matrix(int r, int c);  //Default constructor
+    int getRows();
+    int getCols();
 
     // we need operator[] to return a modifiable L-value, that is, a non-const reference
     // so that we can store a value in a cell of a Matrix
@@ -65,6 +66,34 @@ public:
     // operator+ has a const reference parameter, promises not to modify this object
     // and returns a const value
     const Matrix<T> operator+(const Matrix<T> &rhs) const;
+
+    //An overloaded inequality operator to compare 2 matrices.
+    bool operator!=(const Matrix<T> &rhs);
+
+    //An overloaded equality operator to compare 2 matrices.
+    bool operator==(const Matrix<T> &rhs);
+
+    /**
+     * @brief overrides the << operator for Matrix<T>
+     *        because this is a friend function, and because we have a templated class
+     *        we need to define the function inside our class declaration
+     * @param os the stream that we are using << with
+     * @param obj  the Matrix<T> we are trying to insert into the stream
+     * @return a non-const reference, which allows us to chain << operators
+     */
+    friend std::ostream& operator<<(std::ostream& os, const Matrix<T> &obj) {
+        for (auto rowIt = obj.data.begin(); rowIt != obj.data.end(); ++rowIt) {
+            for (auto colIt = rowIt->begin(); colIt != rowIt->end(); ++colIt) {
+                if (colIt != rowIt->end() - 1) {
+                    os << *colIt << " ";
+                } else {
+                    os << *colIt;
+                }
+            }
+            os << std::endl;
+        }
+        return os;
+    }
 };
 
 ///////////////////////////////////////////////////////
@@ -104,19 +133,34 @@ Matrix<T>::Matrix(int r, int c) {
 }
 
 /**
- * @brief prints out to the terminal the elements of this matrix
- *        we assume row-major ordering of the elements
+ * @brief Gets the number of rows of this matrix.
+ *
+ * @return the number of rows in this matrix.
  */
 template<typename T>
-void Matrix<T>::print() const {
+int Matrix<T>::getRows() {
+    int numRows = 0; //The amount of rows per Matrix.
+    
+    for (auto rowit = data.begin(); rowit != data.end(); ++rowit) 
+        numRows++;
+    return numRows;
+}
+
+/**
+ * @brief Gets the number of columns of this matrix.
+ *
+ * @return the number of columns in this matrix.
+ */
+template<typename T>
+int Matrix<T>::getCols() {
+    int numElmts = 0; //The total number of elements in Matrix.
+    
     for (auto rowit = data.begin(); rowit != data.end(); ++rowit) {
-        std::vector<T> rowData = *rowit; //Pointing to each row.
-        for (auto colit = rowData.begin(); colit != rowData.end(); ++colit) {
-            std::cout  << *colit << " "; //Pointing to each column per row.
-        }
-        std::cout << std::endl;
+      std::vector<T> rowData = *rowit;
+      for (auto colit = rowData.begin(); colit != rowData.end(); ++colit) 
+        numElmts++;
     }
-    std::cout << std::endl;
+    return numElmts/getRows();
 }
 
 /*We want both "matrix[x][y] = data" and "matrix[x][y] = mat2[x][y]" to work*/
@@ -179,19 +223,45 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
 }
 
 /**
- * @brief 
+ * @brief Overloaded inequality operator to check if 2 matrices
+ *	  have differing dimensions.
  *
- *
- *
+ * @param rhs, (ref) the right-hand-side matrix to check dimensions with lhs matrix.
+ * @return true if != applies, else return false if == is valid instead. 
  */
 template<typename T>
-bool & Matrix<T>::operator!=(const Matrix<T> &rhs) const {
+bool Matrix<T>::operator!=(const Matrix<T> &rhs) {
     Matrix<T> lhs = *this;
-     //If the dimensions aren't identical per matrix, then != returns true. 
+    //If the dimensions aren't identical per matrix, then != returns true. 
     if (lhs.rows != rhs.rows || lhs.cols != rhs.cols)
 	return true;  
     return false;  //Else, != doesn't apply in this case, return false.
 }
+
+/**
+ * @brief Overloaded equality operator to check if 2 matrices  
+ *	  are of the same dimensions.
+ *
+ * @param rhs, (ref) the right-hand-side matrix to check elements and dimensions with
+ * 	  lhs matrix.
+ * @return true if identical dimensions & identical elements/data. Else, return false.
+ */
+template<typename T>
+bool Matrix<T>::operator==(const Matrix<T> &rhs) {
+    Matrix<T> lhs = *this;
+    //If the dimensions aren't identical, then == returns false.
+    if (!(lhs.rows == rhs.rows) || !(lhs.cols == rhs.cols))
+	return false;
+    //Else, dimensions are equivalent, then check if all elements are identical.
+    for (int i = 0; i < lhs.rows; i++) {
+        for (int j = 0; j < lhs.cols; j++) {
+	    if (rhs[i][j] != lhs[i][j]) 
+		return false;
+	}
+    }
+    return true;  //If all elements identical btwn matrices, return true.
+}
+
 
 
 

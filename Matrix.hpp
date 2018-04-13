@@ -61,16 +61,20 @@ public:
     // so that we can store a value in a cell of a Matrix
     std::vector<T> & operator[](const int index); 
 
-    // we need a second operator[] in order to make our operator+ below work
-    // the operator+ function below needs a const Matrix as a parameter
-    // thus this second opertor[] function returns a const reference
     const std::vector<T> & operator[](const int index) const; 
 
     // operator+ has a const reference parameter, promises not to modify this object
     // and returns a const value
     const Matrix<T> operator+(const Matrix<T> &rhs) const;
     
-    // operator* has a const referene param, doesn't mod the object, returns const value
+    //For scalars that are on the RHS of the * operator (matrix on LHS of *)
+    //Return the modified vector after scalar multiplication.
+    const Matrix<T> operator*(const int scalar); 
+ 
+    //For scalars on the LHS of the * operator (matrix on RHS of *)
+    const Matrix<T> operator*(const int scalar, const Matrix<T> &rhs); 
+    
+    // operator* has a const reference param, doesn't mod the object, returns const value
     const Matrix<T> operator*(const Matrix<T> &rhs) const;
     
     // operator- for subtraction of matrices.
@@ -172,7 +176,6 @@ int Matrix<T>::getCols() {
     return numCols;
 }
 
-/*We want both "matrix[x][y] = data" and "matrix[x][y] = mat2[x][y]" to work*/
 
 /**
  * @brief accesses the row index of this Matrix
@@ -230,7 +233,34 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
     }
     return result;
 }
-//TODO MAKE ME
+
+
+template<typename T>
+const Matrix<T> Matrix<T>::operator*(const int scalar, const Matrix<T> &rhs) {
+    for (int i = 0; i < lhs.rows; i++) 
+        for (int j = 0; j < lhs.cols; j++) 
+	    rhs[i][j] *= scalar;
+    
+    return rhs;
+}
+/**
+ * @brief multiplies the object on LHS of * operator by the scalar param
+ *	  on the RHS.
+ *
+ * @param the scalar integer we are multiplying matrix by.
+ * @return the modified LHS Object (Matrix) being multiplied.
+ */
+template<typename T>
+const Matrix<T> Matrix<T>::operator*(const int scalar) {
+    Matrix<T> lhs = *this;
+    
+    for (int i = 0; i < lhs.rows; i++) 
+        for (int j = 0; j < lhs.cols; j++) 
+	    lhs[i][j] *= scalar;
+   
+    return lhs;
+}  
+
 /**
  * @brief Multiples the Matrix<T> on the right side of the * operator to the matrix on the left
  *        side of the * sign.

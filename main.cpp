@@ -50,7 +50,7 @@ int main() {
     p[1][1] = 2;
     p[1][2] = 5;
     std::cout << "Matrix p:" << std::endl;
-    std::cout << n << std::endl;
+    std::cout << p << std::endl;
 
     // perform comparisons of matrices.
     Matrix<int> mCopy(2, 2);

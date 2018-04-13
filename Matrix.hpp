@@ -241,26 +241,26 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
  * @return a const Matrix that represents the product.
  */
 template<typename T>
-const Matrix<T> Matrix<T>::operator*(const Matrix<T> &mat1) const {
-    Matrix<T> mat2 = *this;
-    std::cout << mat1.cols << " : col count in mat1\n";
-    std::cout << mat2.rows << " : row count in mat2\n";
+const Matrix<T> Matrix<T>::operator*(const Matrix<T> &rhs) const {
+    Matrix<T> lhs = *this;
+    std::cout << lhs.cols << " : col count in mat1\n";
+    std::cout << rhs.rows << " : row count in mat2\n";
 
-    if (mat1.cols != mat2.rows)  //Standard rule for multiplying matrices.
+    if (lhs.cols != rhs.rows)  //Standard rule for multiplying matrices.
         throw DimensionMismatchException();
     
     int sum = 0;  	     //The sum of products btwn 2 matrices.
-    int rows = mat1.rows;    //Rows of mat1: outer loop
-    int cols = mat1.cols;    //**Equivalent to mat2.rows** 
-    int subcols = mat2.cols; //The columns of matrix2, in 3rd loop.
+    int rows = rhs.rows;    //Rows of mat1: outer loop
+    int cols = rhs.cols;    //**Equivalent to mat2.rows** 
+    int subcols = lhs.cols; //The columns of matrix2, in 3rd loop.
     Matrix<T> product(rows, subcols); //Resulting matrix after multiplication. 
     for (int i = 0; i < rows; i++) {
 	//Simultaneously iterating thru rows of mat2.
 	for (int j = 0; j < cols; j++) { 
-	    int mat1Elmt = mat1[i][j];
+	    int mat1Elmt = rhs[i][j];
 	    
             for (int k = 0; k < subcols; k++) {
-		int mat2Elmt = mat2[j][k];  
+		int mat2Elmt = lhs[j][k];  
 		sum += mat1Elmt * mat2Elmt;
 		product[i][k] = sum;
 	    }

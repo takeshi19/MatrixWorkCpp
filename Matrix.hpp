@@ -4,7 +4,10 @@
 // 
 // CS 368, Spring 2018
 // Matrix.hpp
-// TODO ADD class description
+//
+// This code creates overloaded arithmetic 
+// operators in order to faciliate the 
+// math operations on matrices.  
 //////////////////////////////////////////////
 
 #ifndef LECTURE9_MATRIX_HPP
@@ -66,6 +69,12 @@ public:
     // operator+ has a const reference parameter, promises not to modify this object
     // and returns a const value
     const Matrix<T> operator+(const Matrix<T> &rhs) const;
+    
+    // operator* has a const referene param, doesn't mod the object, returns const value
+    const Matrix<T> operator*(const Matrix<T> &rhs) const;
+    
+    // operator- for subtraction of matrices.
+    const Matrix<T> operator-(const Matrix<T> &rhs) const;
 
     //An overloaded inequality operator to compare 2 matrices.
     bool operator!=(const Matrix<T> &rhs);
@@ -153,14 +162,16 @@ int Matrix<T>::getRows() {
  */
 template<typename T>
 int Matrix<T>::getCols() {
-    int numElmts = 0; //The total number of elements in Matrix.
+  //FIXME check ur logic here...  
     
-    for (auto rowit = data.begin(); rowit != data.end(); ++rowit) {
+   int numCols = 0;
+   for (auto rowit = data.begin(); rowit != data.end(); ++rowit) {
       std::vector<T> rowData = *rowit;
       for (auto colit = rowData.begin(); colit != rowData.end(); ++colit) 
-        numElmts++;
+        numCols++;
+      break;
     }
-    return numElmts/getRows();
+    return numCols;
 }
 
 /*We want both "matrix[x][y] = data" and "matrix[x][y] = mat2[x][y]" to work*/
@@ -221,21 +232,83 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
     }
     return result;
 }
+//TODO MAKE ME
+/**
+ * @brief Multiples the Matrix<T> on the right side of the * operator to the matrix on the left
+ *        side of the * sign.
+ * @param rhs a const reference to the Matrix on the right of the  
+ *        multiplication operator.
+ * @return a const Matrix that represents the product.
+ */
+template<typename T>
+const Matrix<T> Matrix<T>::operator*(const Matrix<T> &mat1) const {
+    Matrix<T> mat2 = *this;
+    std::cout << mat1.cols << " : col count in mat1\n";
+    std::cout << mat2.rows << " : row count in mat2\n";
 
+    if (mat1.cols != mat2.rows)  //Standard rule for multiplying matrices.
+        throw DimensionMismatchException();
+    
+    int sum = 0;  	     //The sum of products btwn 2 matrices.
+    int rows = mat1.rows;    //Rows of mat1: outer loop
+    int cols = mat1.cols;    //**Equivalent to mat2.rows** 
+    int subcols = mat2.cols; //The columns of matrix2, in 3rd loop.
+    Matrix<T> product(rows, subcols); //Resulting matrix after multiplication. 
+    for (int i = 0; i < rows; i++) {
+	//Simultaneously iterating thru rows of mat2.
+	for (int j = 0; j < cols; j++) { 
+	    int mat1Elmt = mat1[i][j];
+	    
+            for (int k = 0; k < subcols; k++) {
+		int mat2Elmt = mat2[j][k];  
+		sum += mat1Elmt * mat2Elmt;
+		product[i][k] = sum;
+	    }
+        }
+	sum = 0;  //Clear sum to store in product after each outermost loop.
+    }
+    return product;
+}
+
+/**
+ * @brief Subtracts the Matrix<T> on the right side of the - operator to the matrix on the left
+ *        side of the - sign.
+ * @param rhs a const reference to the Matrix on the right of the - operator
+ * @return a const Matrix that represents the result.
+ */
+template<typename T>
+const Matrix<T> Matrix<T>::operator-(const Matrix<T> &rhs) const {
+    Matrix<T> lhs = *this;
+    //Need the matrices to be of same size for the multiplication to happen.
+    if (lhs.rows != rhs.rows || lhs.cols != rhs.cols) {
+        throw DimensionMismatchException();
+    }
+    int rows = rhs.rows;
+    int cols = rhs.cols;
+    Matrix<T> result(rows, cols);
+    //Adding the matrices by summing up all of their elements and storing them 
+	//into a new matrix of an equivalent size.
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            std::cout << "subtracting elements at [" << i << "][" << j << "]" << std::endl;
+            result[i][j] = lhs[i][j] - rhs[i][j];
+        }
+    }
+    return result;
+}
 /**
  * @brief Overloaded inequality operator to check if 2 matrices
  *	  have differing dimensions.
  *
  * @param rhs, (ref) the right-hand-side matrix to check dimensions with lhs matrix.
- * @return true if != applies, else return false if == is valid instead. 
+ * @return true if != applies. 
  */
 template<typename T>
 bool Matrix<T>::operator!=(const Matrix<T> &rhs) {
     Matrix<T> lhs = *this;
     //If the dimensions aren't identical per matrix, then != returns true. 
-    if (lhs.rows != rhs.rows || lhs.cols != rhs.cols)
+    if ((lhs.rows != rhs.rows) || (lhs.cols != rhs.cols)) 
 	return true;  
-    return false;  //Else, != doesn't apply in this case, return false.
 }
 
 /**

@@ -71,7 +71,6 @@ int main() {
     }
     std::cout << std::endl;
 
-    /* move this line down through main.cpp as you develop Matrix.hpp
     // add 2 matrices of integers.
     Matrix<int> iAdd = m + n;
     std::cout << "iAdd = m + n" << std::endl;
@@ -83,12 +82,13 @@ int main() {
     std::cout << iSub << std::endl;
 
     // multiply 2 matrices of integers.
-    Matrix<int> iMul = m * p;
+    Matrix<int> iMul = m * p;  //FIXME on this mult.
     std::cout << "iMul = m * p" << std::endl;
     std::cout << iMul << std::endl;
 
+    /* move this line down through main.cpp as you develop Matrix.hpp
     // multiply a matrix of integers by an integer.
-    Matrix<int> iScalarMul = 2 * m;
+    Matrix<int> iScalarMul = 2 * m; //FIXME this doesnt produce proper products
     std::cout << "iScalarMul = 2 * m" << std::endl;
     std::cout << iScalarMul << std::endl;
     iScalarMul = n * 3;
@@ -96,7 +96,7 @@ int main() {
     std::cout << iScalarMul << std::endl;
 
     // compound addition of matrix of integers.
-    m += n;
+    m += n; //TODO make overloaded op +=
     std::cout << "m += n" << std::endl;
     std::cout << m << std::endl;
     std::cout << "iAdd:" << std::endl;
@@ -109,7 +109,7 @@ int main() {
     std::cout << std::endl;
 
     // compound subtraction of matrix of integers.
-    m -= 2 * n;
+    m -= 2 * n;  /TODO make overloaded op -=
     std::cout << "m -= 2 * n" << std::endl;
     std::cout << m << std::endl;
     std::cout << "iSub:" << std::endl;
@@ -123,7 +123,7 @@ int main() {
 
     // compound addition and multiplication of matrix of integers.
     m += n;
-    m *= n;
+    m *= n;//TODO make overloaded op *=
     std::cout << "m += n" << std::endl;
     std::cout << "m *= n" << std::endl;
     std::cout << m << std::endl;

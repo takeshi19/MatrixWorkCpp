@@ -69,11 +69,8 @@ public:
     
     //For scalars that are on the RHS of the * operator (matrix on LHS of *)
     //Return the modified vector after scalar multiplication.
-    const Matrix<T> operator*(const int scalar); 
+    const Matrix<T> operator*(const T scalar); 
  
-    //For scalars on the LHS of the * operator (matrix on RHS of *)
-    const Matrix<T> operator*(const int scalar, const Matrix<T> &rhs); 
-    
     // operator* has a const reference param, doesn't mod the object, returns const value
     const Matrix<T> operator*(const Matrix<T> &rhs) const;
     
@@ -139,6 +136,7 @@ Matrix<T>::Matrix(int r, int c) {
     }
     rows = r;
     cols = c;
+
     data.resize(rows);
     for (int r = 0; r < rows; ++r) {
         data[r].resize(cols);
@@ -152,11 +150,7 @@ Matrix<T>::Matrix(int r, int c) {
  */
 template<typename T>
 int Matrix<T>::getRows() {
-    int numRows = 0; //The amount of rows per Matrix.
-    
-    for (auto rowit = data.begin(); rowit != data.end(); ++rowit) 
-        numRows++;
-    return numRows;
+    return rows;  
 }
 
 /**
@@ -166,14 +160,7 @@ int Matrix<T>::getRows() {
  */
 template<typename T>
 int Matrix<T>::getCols() {
-   int numCols = 0;
-   for (auto rowit = data.begin(); rowit != data.end(); ++rowit) {
-      std::vector<T> rowData = *rowit;
-      for (auto colit = rowData.begin(); colit != rowData.end(); ++colit) 
-        numCols++;
-      break;
-    }
-    return numCols;
+    return cols;  
 }
 
 
@@ -186,9 +173,6 @@ int Matrix<T>::getCols() {
  */
 template<typename T>
 std::vector<T> & Matrix<T>::operator[](const int index) {
-    //By using matrix[row1][row2], we are accessing a whole row (row1), then a subrow (row2)
-      //of that whole row. Equivalent to accessing elements at coordinates x,y of matrix.
-    std::cout << " calling non-const operator[] with index = " << index << std::endl;
     //We don't use const because matrix[x][y] is on LHS of eqtn and it can be edited with arithmetic.
     return data[index];
 }
@@ -202,7 +186,6 @@ std::vector<T> & Matrix<T>::operator[](const int index) {
  */
 template<typename T>
 const std::vector<T> & Matrix<T>::operator[](const int index) const {
-    std::cout << "     calling const operator[] with index = " << index << std::endl;
     //We use const because we tell compiler we wont change matrix[x][y] when its on RHS of equation.
     return data[index]; 
 }
@@ -215,7 +198,7 @@ const std::vector<T> & Matrix<T>::operator[](const int index) const {
  */
 template<typename T>
 const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
-    Matrix<T> lhs = *this; //TODO findout how this worx.
+    Matrix<T> lhs = *this; 
     //Need the matrices to be of same size for the addition to happen.
     if (lhs.rows != rhs.rows || lhs.cols != rhs.cols) {
         throw DimensionMismatchException();
@@ -227,22 +210,12 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
 	//into a new matrix of an equivalent size.
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            std::cout << "adding elements at [" << i << "][" << j << "]" << std::endl;
             result[i][j] = lhs[i][j] + rhs[i][j];
         }
     }
     return result;
 }
 
-
-template<typename T>
-const Matrix<T> Matrix<T>::operator*(const int scalar, const Matrix<T> &rhs) {
-    for (int i = 0; i < lhs.rows; i++) 
-        for (int j = 0; j < lhs.cols; j++) 
-	    rhs[i][j] *= scalar;
-    
-    return rhs;
-}
 /**
  * @brief multiplies the object on LHS of * operator by the scalar param
  *	  on the RHS.
@@ -251,7 +224,7 @@ const Matrix<T> Matrix<T>::operator*(const int scalar, const Matrix<T> &rhs) {
  * @return the modified LHS Object (Matrix) being multiplied.
  */
 template<typename T>
-const Matrix<T> Matrix<T>::operator*(const int scalar) {
+const Matrix<T> Matrix<T>::operator*(const T scalar) {
     Matrix<T> lhs = *this;
     
     for (int i = 0; i < lhs.rows; i++) 
@@ -260,6 +233,19 @@ const Matrix<T> Matrix<T>::operator*(const int scalar) {
    
     return lhs;
 }  
+
+/**
+ * @brief Does Matrix multiplication for equations where the scalar is on 
+ *	  the LHS and the Matrix is on RHS.
+ *
+ * @param scalar, the T scalar to multiply our 2nd param by
+ * @param &rhs, the 3nd param (Matrix) being multiplied by scalar.
+ * @return the multiplied Matrix.
+ */
+template<typename T>
+const Matrix<T> operator*(const T scalar, Matrix<T> &rhs) {
+    return rhs * scalar;  //Just call on the * operator above.
+}
 
 /**
  * @brief Multiples the Matrix<T> on the right side of the * operator to the matrix on the left
@@ -271,8 +257,6 @@ const Matrix<T> Matrix<T>::operator*(const int scalar) {
 template<typename T>
 const Matrix<T> Matrix<T>::operator*(const Matrix<T> &rhs) const {
     Matrix<T> lhs = *this;
-    std::cout << lhs.cols << " : col count in mat1\n";
-    std::cout << rhs.rows << " : row count in mat2\n";
 
     if (lhs.cols != rhs.rows)  //Standard rule for multiplying matrices.
         throw DimensionMismatchException();

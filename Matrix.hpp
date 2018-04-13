@@ -162,8 +162,6 @@ int Matrix<T>::getRows() {
  */
 template<typename T>
 int Matrix<T>::getCols() {
-  //FIXME check ur logic here...  
-    
    int numCols = 0;
    for (auto rowit = data.begin(); rowit != data.end(); ++rowit) {
       std::vector<T> rowData = *rowit;
@@ -248,25 +246,18 @@ const Matrix<T> Matrix<T>::operator*(const Matrix<T> &rhs) const {
 
     if (lhs.cols != rhs.rows)  //Standard rule for multiplying matrices.
         throw DimensionMismatchException();
-    
-    int sum = 0;  	     //The sum of products btwn 2 matrices.
-    int rows = rhs.rows;    //Rows of mat1: outer loop
-    int cols = rhs.cols;    //**Equivalent to mat2.rows** 
-    int subcols = lhs.cols; //The columns of matrix2, in 3rd loop.
-    Matrix<T> product(rows, subcols); //Resulting matrix after multiplication. 
-    for (int i = 0; i < rows; i++) {
-	//Simultaneously iterating thru rows of mat2.
-	for (int j = 0; j < cols; j++) { 
-	    int mat1Elmt = rhs[i][j];
-	    
-            for (int k = 0; k < subcols; k++) {
-		int mat2Elmt = lhs[j][k];  
-		sum += mat1Elmt * mat2Elmt;
-		product[i][k] = sum;
-	    }
-        }
-	sum = 0;  //Clear sum to store in product after each outermost loop.
-    }
+
+    Matrix<T> product(lhs.rows, rhs.cols); //Resulting matrix after multiplication. 
+    //**Initializing the product array to zeros.**
+    for (int i = 0; i < product.rows; i++) 
+	for (int j = 0; j < product.cols; j++) 
+ 	    product[i][j] = 0;
+ 
+    for (int i = 0; i < lhs.rows; i++) 
+	for (int j = 0; j < rhs.cols; j++) 
+            for (int k = 0; k < lhs.cols; k++) 
+		product[i][j] += lhs[i][k] * rhs[k][j];
+      
     return product;
 }
 

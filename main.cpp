@@ -101,15 +101,15 @@ int main() {
     std::cout << iMul2 << std::endl;
 
     // multiply a matrix of integers by an integer.
-    Matrix<int> iScalarMul = 2 * m; //FIXME this doesnt produce proper products
+    Matrix<int> iScalarMul = 2 * m;
     std::cout << "iScalarMul = 2 * m" << std::endl;
     std::cout << iScalarMul << std::endl;
     iScalarMul = n * 3;
     std::cout << "iScalarMul = n * 3" << std::endl;
     std::cout << iScalarMul << std::endl;
-/*
+
     // compound addition of matrix of integers.
-    m += n; //TODO make overloaded op +=
+    m += n; 
     std::cout << "m += n" << std::endl;
     std::cout << m << std::endl;
     std::cout << "iAdd:" << std::endl;
@@ -119,10 +119,10 @@ int main() {
     } else {
         std::cout << "m and iAdd are NOT equal." << std::endl;
     }
-    std::cout << std::endl;
 
+    std::cout << std::endl;
     // compound subtraction of matrix of integers.
-    m -= 2 * n;  /TODO make overloaded op -=
+    m -= 2 * n;  
     std::cout << "m -= 2 * n" << std::endl;
     std::cout << m << std::endl;
     std::cout << "iSub:" << std::endl;
@@ -136,7 +136,7 @@ int main() {
 
     // compound addition and multiplication of matrix of integers.
     m += n;
-    m *= n;//TODO make overloaded op *=
+    m *= n;
     std::cout << "m += n" << std::endl;
     std::cout << "m *= n" << std::endl;
     std::cout << m << std::endl;
@@ -148,12 +148,10 @@ int main() {
         std::cout << "m and iMul are equal." << std::endl;
     }
     std::cout << std::endl;
-
     // compound multiplication of a matrix of integers by an integer.
     m *= 10;
     std::cout << "m *= 10" << std::endl;
     std::cout << m << std::endl;
-
 
     // create 5 complex numbers.
     std::complex<int> c1(1, 0);
@@ -170,7 +168,7 @@ int main() {
     cm[1][1] = c4;
     std::cout << "Matrix cm:" << std::endl;
     std::cout << cm << std::endl;
-
+    
     // create another 2 x 2 matrix of complex numbers.
     Matrix<std::complex<int>> cn(2, 2);
     cn[0][0] = c2;
@@ -184,7 +182,7 @@ int main() {
     Matrix<std::complex<int>> cAdd = cm + cn;
     std::cout << "cAdd = cm + cn" << std::endl;
     std::cout << cAdd << std::endl;
-
+    
     // subtract 2 matrices of complex numbers.
     Matrix<std::complex<int>> cSub = cm - cn;
     std::cout << "cSub = cm - cn" << std::endl;
@@ -254,7 +252,6 @@ int main() {
     std::cout << "cm *= 10" << std::endl;
     std::cout << cm << std::endl;
 
-
    ///////////////////////////////////////////////////////////////
    // tests for exception handling
    //////////////////////////////////////////////////////////////
@@ -297,16 +294,12 @@ int main() {
     std::cout << std::endl;
 
     // test for RowIndexOutOfBounds
-    std::cout << "trying to access row index -1" << std::endl;
+/*    std::cout << "trying to access row index -1" << std::endl;
     try{
         a[-1][0] = 99;
     } catch(RowIndexOutOfBoundsException e){
         std::cout << e.what() << std::endl;
     } 
-
-
-    */
-
-
+*/
     return 0;
 }

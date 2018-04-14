@@ -62,11 +62,20 @@ public:
     std::vector<T> & operator[](const int index); 
 
     const std::vector<T> & operator[](const int index) const; 
-
+    
+    //Assignment and addition operator in 1. Ca-ca-combo breaker!
+    const Matrix<T> operator+=(const Matrix<T> &rhs);
+    
     // operator+ has a const reference parameter, promises not to modify this object
     // and returns a const value
     const Matrix<T> operator+(const Matrix<T> &rhs) const;
-    
+   
+    //Assignment and multiplication operator.
+    const Matrix<T> operator*=(const Matrix<T> &rhs);
+   
+    //Assignment and multiplication operator with a SCALAR.
+    const Matrix<T> operator*=(const T scalar);
+ 
     //For scalars that are on the RHS of the * operator (matrix on LHS of *)
     //Return the modified vector after scalar multiplication.
     const Matrix<T> operator*(const T scalar); 
@@ -74,6 +83,9 @@ public:
     // operator* has a const reference param, doesn't mod the object, returns const value
     const Matrix<T> operator*(const Matrix<T> &rhs) const;
     
+    //Assignment and subtraction operator in 1.    
+    const Matrix<T> operator-=(const Matrix<T> &rhs);
+ 
     // operator- for subtraction of matrices.
     const Matrix<T> operator-(const Matrix<T> &rhs) const;
 
@@ -205,7 +217,7 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
     }
     int rows = rhs.rows;
     int cols = rhs.cols;
-    Matrix<T> result(rows, cols);
+    Matrix<T> result(rows, cols); 
     //Adding the matrices by summing up all of their elements and storing them 
 	//into a new matrix of an equivalent size.
     for (int i = 0; i < rows; ++i) {
@@ -214,6 +226,20 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
         }
     }
     return result;
+}
+
+/**
+ * @brief Adds the instance of this class to the rhs Matrix parameter,
+ *        then assigns the sum to the instance of this class. Smart because
+ *	  it calls on the above + operator.
+ * @param rhs, the matrix being added to the instance of this class.
+ * @return the summed instance of class Matrix.
+ */ 
+template<typename T>
+const Matrix<T> Matrix<T>::operator+=(const Matrix<T> &rhs) {
+    Matrix<T> lhs = *this;
+    *this = lhs + rhs;
+    return *this;
 }
 
 /**
@@ -232,6 +258,13 @@ const Matrix<T> Matrix<T>::operator*(const T scalar) {
 	    lhs[i][j] *= scalar;
    
     return lhs;
+}  //TODO call on this operator bc its closest to what we r doin
+//TODO comments please
+template<typename T>
+const Matrix<T> Matrix<T>::operator*=(const T scalar) {
+    Matrix<T> lhs = *this;
+    *this = lhs * scalar;
+    return *this;
 }  
 
 /**
@@ -248,7 +281,7 @@ const Matrix<T> operator*(const T scalar, Matrix<T> &rhs) {
 }
 
 /**
- * @brief Multiples the Matrix<T> on the right side of the * operator to the matrix on the left
+ * @brief Multiplies the Matrix<T> on the right side of the * operator to the matrix on the left
  *        side of the * sign.
  * @param rhs a const reference to the Matrix on the right of the  
  *        multiplication operator.
@@ -276,6 +309,20 @@ const Matrix<T> Matrix<T>::operator*(const Matrix<T> &rhs) const {
 }
 
 /**
+ * @brief Assignment and multiplication in one operation. Calls on the
+ *        standard * operator above.
+ * @param rhs a const reference to Matrix on right of *= op.
+ * @return a reference to this class that was multiplied by rhs & 
+ *         assigned to itself.
+ */
+template<typename T>
+const Matrix<T> Matrix<T>::operator*=(const Matrix<T> &rhs) {
+    Matrix<T> lhs = *this;
+    *this = lhs * rhs;
+    return *this;
+}
+
+/**
  * @brief Subtracts the Matrix<T> on the right side of the - operator to the matrix on the left
  *        side of the - sign.
  * @param rhs a const reference to the Matrix on the right of the - operator
@@ -295,12 +342,25 @@ const Matrix<T> Matrix<T>::operator-(const Matrix<T> &rhs) const {
 	//into a new matrix of an equivalent size.
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            std::cout << "subtracting elements at [" << i << "][" << j << "]" << std::endl;
             result[i][j] = lhs[i][j] - rhs[i][j];
         }
     }
     return result;
 }
+
+/**
+ * @brief Assigns and subtracts the rhs matrix to the instance of this class.
+ *
+ * @param rhs, reference to the Matrix on right side of -= operator.
+ * @return an instance of this class where -= did its work.
+ */
+template<typename T>
+const Matrix<T> Matrix<T>::operator-=(const Matrix<T> & rhs) {
+    Matrix<T> lhs = *this;
+    *this = lhs - rhs;
+    return *this;
+}
+
 /**
  * @brief Overloaded inequality operator to check if 2 matrices
  *	  have differing dimensions.
@@ -313,7 +373,15 @@ bool Matrix<T>::operator!=(const Matrix<T> &rhs) {
     Matrix<T> lhs = *this;
     //If the dimensions aren't identical per matrix, then != returns true. 
     if ((lhs.rows != rhs.rows) || (lhs.cols != rhs.cols)) 
-	return true;  
+    {	
+	std::cout << "Returning true for != operator\n";
+	return true;
+   	
+    } 
+    if (!(lhs == rhs)) 
+	return true; 
+    return false;  //Else, dimensions are equal & values identical.
+  // std::cout << "Returning nothing I guess from != \n";
 }
 
 /**
@@ -328,20 +396,19 @@ template<typename T>
 bool Matrix<T>::operator==(const Matrix<T> &rhs) {
     Matrix<T> lhs = *this;
     //If the dimensions aren't identical, then == returns false.
-    if (!(lhs.rows == rhs.rows) || !(lhs.cols == rhs.cols))
-	return false;
+    if ((lhs.rows != rhs.rows) || (lhs.cols != rhs.cols)) 
+        return false;
     //Else, dimensions are equivalent, then check if all elements are identical.
     for (int i = 0; i < lhs.rows; i++) {
         for (int j = 0; j < lhs.cols; j++) {
-	    if (rhs[i][j] != lhs[i][j]) 
+	    if (rhs[i][j] != lhs[i][j]) {
+		std::cout << "Returning false from == operator bc of diff values\n";
 		return false;
 	}
     }
+}
     return true;  //If all elements identical btwn matrices, return true.
 }
-
-
-
 
 
 

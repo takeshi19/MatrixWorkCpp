@@ -85,20 +85,6 @@ int main() {
     Matrix<int> iMul = m * p;  
     std::cout << "iMul = m * p" << std::endl;
     std::cout << iMul << std::endl;
-    Matrix<int> z(2, 3);
-    z[0][0] = 2;
-    z[0][1] = 4;
-    z[0][2] = 5;
-    z[1][0] = 6;
-    z[1][1] = 7;
-    z[1][2] = 8;
-    Matrix<int> o(3, 1);
-    o[0][0] = 5;
-    o[1][0] = 3;
-    o[2][0] = 1;
-    Matrix<int> iMul2 = z * o;  
-    std::cout << "iMul2 = z * o" << std::endl;
-    std::cout << iMul2 << std::endl;
 
     // multiply a matrix of integers by an integer.
     Matrix<int> iScalarMul = 2 * m;
@@ -294,12 +280,11 @@ int main() {
     std::cout << std::endl;
 
     // test for RowIndexOutOfBounds
-/*    std::cout << "trying to access row index -1" << std::endl;
+    std::cout << "trying to access row index -1" << std::endl;
     try{
         a[-1][0] = 99;
     } catch(RowIndexOutOfBoundsException e){
         std::cout << e.what() << std::endl;
     } 
-*/
     return 0;
 }

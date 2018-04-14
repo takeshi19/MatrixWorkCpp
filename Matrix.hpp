@@ -40,6 +40,17 @@ public:
     }
 };
 
+/**
+ * @brief This class derives from runtime_error
+ *	  It is thrown when user tries accessing an invalid row idx.
+ */
+class RowIndexOutOfBoundsException : public std::runtime_error {
+public:
+    RowIndexOutOfBoundsException() : std::runtime_error("row index out of bounds")
+    {
+    }
+};
+
 ///////////////////////////////////////////////////////
 // DECLARATION OF THE MATRIX TEMPLATED CLASS
 // YOU WILL NEED TO ADD MORE PROTOTYPES HERE
@@ -175,17 +186,21 @@ int Matrix<T>::getCols() {
     return cols;  
 }
 
-
+	
 /**
  * @brief accesses the row index of this Matrix
  *        we assume row-major ordering and a start index of 0
  *        this non-const function returns a non-const reference
- * @param index     the index which corresponds to a vector (row) in the matrix
+ *
+ * @param index, the index which corresponds to a vector (row) in the matrix
  * @return a non-const vector reference that is suitable for a Left-value
  */
 template<typename T>
 std::vector<T> & Matrix<T>::operator[](const int index) {
     //We don't use const because matrix[x][y] is on LHS of eqtn and it can be edited with arithmetic.
+    if (index >= rows || index < 0) //Throw rowIndexOOBE if accessing invalid row.
+	throw RowIndexOutOfBoundsException();
+
     return data[index];
 }
 
@@ -193,19 +208,23 @@ std::vector<T> & Matrix<T>::operator[](const int index) {
 /**
  * @brief accesses the row index of this Matrix
  *        we assume row-major ordering and a start index of 0
+ *
  * @param index, the index which corresponds to a vector (row) in the matrix
  * @return data, a const vector referene that is suitable for a Right-value
  */
 template<typename T>
 const std::vector<T> & Matrix<T>::operator[](const int index) const {
     //We use const because we tell compiler we wont change matrix[x][y] when its on RHS of equation.
+    if (index >= rows || index < 0) //Throw rowIndexOOBE if accessing invalid row.
+	throw RowIndexOutOfBoundsException();
     return data[index]; 
 }
 
 /**
  * @brief adds the Matrix<T> on the right side of the + operator to the matrix on the left
  *        side of the + sign.
- * @param rhs a const reference to the Matrix on the right of the + operator
+ *
+ * @param rhs, a const reference to the Matrix on the right of the + operator
  * @return a const Matrix that represents the sum
  */
 template<typename T>
@@ -232,6 +251,7 @@ const Matrix<T> Matrix<T>::operator+(const Matrix<T> &rhs) const {
  * @brief Adds the instance of this class to the rhs Matrix parameter,
  *        then assigns the sum to the instance of this class. Smart because
  *	  it calls on the above + operator.
+ *
  * @param rhs, the matrix being added to the instance of this class.
  * @return the summed instance of class Matrix.
  */ 
@@ -246,7 +266,7 @@ const Matrix<T> Matrix<T>::operator+=(const Matrix<T> &rhs) {
  * @brief multiplies the object on LHS of * operator by the scalar param
  *	  on the RHS.
  *
- * @param the scalar integer we are multiplying matrix by.
+ * @param scalar, the scalar we are multiplying matrix by.
  * @return the modified LHS Object (Matrix) being multiplied.
  */
 template<typename T>
@@ -258,8 +278,14 @@ const Matrix<T> Matrix<T>::operator*(const T scalar) {
 	    lhs[i][j] *= scalar;
    
     return lhs;
-}  //TODO call on this operator bc its closest to what we r doin
-//TODO comments please
+}  
+
+/**
+ * @brief Compound multiplication WITH a scalar.
+ *
+ * @param scalar, the scalar to multiply matrix with.
+ * @return this matrix after compound multiplication.
+ */
 template<typename T>
 const Matrix<T> Matrix<T>::operator*=(const T scalar) {
     Matrix<T> lhs = *this;
@@ -283,7 +309,8 @@ const Matrix<T> operator*(const T scalar, Matrix<T> &rhs) {
 /**
  * @brief Multiplies the Matrix<T> on the right side of the * operator to the matrix on the left
  *        side of the * sign.
- * @param rhs a const reference to the Matrix on the right of the  
+ * 
+ * @param &rhs a const reference to the Matrix on the right of the  
  *        multiplication operator.
  * @return a const Matrix that represents the product.
  */
@@ -311,7 +338,8 @@ const Matrix<T> Matrix<T>::operator*(const Matrix<T> &rhs) const {
 /**
  * @brief Assignment and multiplication in one operation. Calls on the
  *        standard * operator above.
- * @param rhs a const reference to Matrix on right of *= op.
+ * 
+ * @param &rhs, a const reference to Matrix on right of *= op.
  * @return a reference to this class that was multiplied by rhs & 
  *         assigned to itself.
  */
@@ -325,7 +353,8 @@ const Matrix<T> Matrix<T>::operator*=(const Matrix<T> &rhs) {
 /**
  * @brief Subtracts the Matrix<T> on the right side of the - operator to the matrix on the left
  *        side of the - sign.
- * @param rhs a const reference to the Matrix on the right of the - operator
+ * 
+ * @param &rhs, a const reference to the Matrix on the right of the - operator
  * @return a const Matrix that represents the result.
  */
 template<typename T>
@@ -351,11 +380,11 @@ const Matrix<T> Matrix<T>::operator-(const Matrix<T> &rhs) const {
 /**
  * @brief Assigns and subtracts the rhs matrix to the instance of this class.
  *
- * @param rhs, reference to the Matrix on right side of -= operator.
+ * @param &rhs, reference to the Matrix on right side of -= operator.
  * @return an instance of this class where -= did its work.
  */
 template<typename T>
-const Matrix<T> Matrix<T>::operator-=(const Matrix<T> & rhs) {
+const Matrix<T> Matrix<T>::operator-=(const Matrix<T> &rhs) {
     Matrix<T> lhs = *this;
     *this = lhs - rhs;
     return *this;
@@ -373,22 +402,18 @@ bool Matrix<T>::operator!=(const Matrix<T> &rhs) {
     Matrix<T> lhs = *this;
     //If the dimensions aren't identical per matrix, then != returns true. 
     if ((lhs.rows != rhs.rows) || (lhs.cols != rhs.cols)) 
-    {	
-	std::cout << "Returning true for != operator\n";
 	return true;
    	
-    } 
     if (!(lhs == rhs)) 
 	return true; 
     return false;  //Else, dimensions are equal & values identical.
-  // std::cout << "Returning nothing I guess from != \n";
 }
 
 /**
  * @brief Overloaded equality operator to check if 2 matrices  
  *	  are of the same dimensions.
  *
- * @param rhs, (ref) the right-hand-side matrix to check elements and dimensions with
+ * @param &rhs, (ref) the right-hand-side matrix to check elements and dimensions with
  * 	  lhs matrix.
  * @return true if identical dimensions & identical elements/data. Else, return false.
  */
@@ -401,17 +426,11 @@ bool Matrix<T>::operator==(const Matrix<T> &rhs) {
     //Else, dimensions are equivalent, then check if all elements are identical.
     for (int i = 0; i < lhs.rows; i++) {
         for (int j = 0; j < lhs.cols; j++) {
-	    if (rhs[i][j] != lhs[i][j]) {
-		std::cout << "Returning false from == operator bc of diff values\n";
+	    if (rhs[i][j] != lhs[i][j]) 
 		return false;
-	}
+        }
     }
-}
     return true;  //If all elements identical btwn matrices, return true.
 }
-
-
-
-
 
 #endif 
